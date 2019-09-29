@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::fmt;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum Marker {
     X,
     O,
@@ -17,13 +17,13 @@ impl fmt::Display for Marker {
 }
 
 pub struct Board {
-    pub rows: u8,
-    pub columns: u8,
-    pub markers: HashMap<(u8, u8), Marker>
+    pub rows: i8,
+    pub columns: i8,
+    pub markers: HashMap<(i8, i8), Marker>
 }
 
 impl Board {
-    pub fn new(rows: u8, columns: u8) -> Board {
+    pub fn new(rows: i8, columns: i8) -> Board {
         Board {
             rows,
             columns,
@@ -31,7 +31,7 @@ impl Board {
         }
     }
 
-    pub fn add_marker(&mut self, column: &u8, marker: &Marker) -> bool {
+    pub fn add_marker(&mut self, column: &i8, marker: &Marker) -> bool {
         match self.find_top(&column) {
             Some(row) => {
                 self.markers.insert((row, *column), *marker);
@@ -41,7 +41,7 @@ impl Board {
         }
     }
 
-    fn find_top(&self, column: &u8) -> Option<u8> {
+    fn find_top(&self, column: &i8) -> Option<i8> {
         for i in 1 .. self.rows+1 {
             if self.markers.get(&(i, *column)).is_none() {
                 return Some(i)
@@ -60,6 +60,39 @@ impl Board {
             }
             println!();
         }
+        println!();
+    }
+
+    fn find_contiguous_count(&self, marker: &Marker, row: &i8, column: &i8, count: i8, dir: &(i8, i8)) -> i8 {
+        match self.markers.get(&((row + dir.0, column + dir.1))) {
+            Some(m) => {
+                if marker == m {
+                    self.find_contiguous_count(marker, &(row + dir.0), &(column + dir.1), count + 1, dir)
+                } else {
+                    count
+                }
+            },
+            None => count
+        }
+    }
+
+    pub fn is_winner(&self, marker: &Marker, row: &i8, column: &i8) -> bool {
+        let dirs: [(i8, i8); 4] = [(1, 0), (0, 1), (1, 1), (-1, 1)];
+
+        for dir in dirs.iter() {
+            let dir_reverse = (-dir.0, -dir.1);
+
+            let count_1 = self.find_contiguous_count(&marker, &row, &column, 1, dir);
+            if count_1 >= 4 {
+                return true
+            }
+
+            let count_2 = self.find_contiguous_count(&marker, &row, &column, count_1, &dir_reverse);
+            if count_2 >= 4 {
+                return true
+            }
+        }
+        return false
     }
 }
 
@@ -95,6 +128,29 @@ mod test {
         board.add_marker(&2, &Marker::O);
 
         // Run using cargo test -- --nocapture, not very readable because of async nature of test
+        board.print();
+    }
+
+    #[test]
+    fn check_winner() {
+        let mut board = Board::new(5, 4);
+
+        board.add_marker(&1, &Marker::O);
+        assert!(!board.is_winner(&Marker::O, &1, &1));
+        board.add_marker(&1, &Marker::X);
+        assert!(!board.is_winner(&Marker::O, &2, &1));
+        assert!(!board.is_winner(&Marker::X, &2, &1));
+
+        board.add_marker(&1, &Marker::O);
+        board.add_marker(&1, &Marker::O);
+        board.add_marker(&1, &Marker::O);
+        assert!(!board.is_winner(&Marker::O, &5, &1));
+
+        board.add_marker(&2, &Marker::O);
+        board.add_marker(&3, &Marker::O);
+        board.add_marker(&4, &Marker::O);
+        assert!(board.is_winner(&Marker::O, &1, &4));
+
         board.print();
     }
 }
