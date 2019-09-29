@@ -170,7 +170,7 @@ mod test {
         assert!(!board.is_filled());
 
         for i in 1 .. 4 {
-            for j in 1 .. 4 {
+            for _ in 1 .. 4 {
                 assert!(!board.is_filled());
                 board.add_marker(&i, &Marker::X);
             }
