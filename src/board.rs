@@ -19,7 +19,7 @@ impl fmt::Display for Marker {
 pub struct Board {
     pub rows: i8,
     pub columns: i8,
-    pub markers: HashMap<(i8, i8), Marker>
+    pub markers: HashMap<(i8, i8), Marker>,
 }
 
 impl Board {
@@ -94,6 +94,15 @@ impl Board {
         }
         return false
     }
+
+    pub fn is_filled(&self) -> bool {
+        for i in 1 .. self.columns+1 {
+            if self.markers.get(&(self.rows, i)).is_none() {
+                return false
+            }
+        }
+        true
+    }
 }
 
 // Tests
@@ -152,5 +161,21 @@ mod test {
         assert!(board.is_winner(&Marker::O, &1, &4));
 
         board.print();
+    }
+
+    #[test]
+    fn board_filled() {
+        let mut board = Board::new(3, 3);
+
+        assert!(!board.is_filled());
+
+        for i in 1 .. 4 {
+            for j in 1 .. 4 {
+                assert!(!board.is_filled());
+                board.add_marker(&i, &Marker::X);
+            }
+        }
+
+        assert!(board.is_filled())
     }
 }
