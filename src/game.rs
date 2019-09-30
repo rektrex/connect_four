@@ -34,7 +34,7 @@ fn get_size() -> (i8, i8) {
     }
 }
 
-fn get_move(board: &mut Board, marker: &Marker) {
+fn get_move(board: &mut Board, marker: &Marker) -> i8 {
     loop {
         println!("Your turn, {}, enter a column:", marker);
 
@@ -51,7 +51,7 @@ fn get_move(board: &mut Board, marker: &Marker) {
         };
 
         if board.add_marker(&column, marker) {
-            break;
+            return column;
         }
 
         println!("The entered column is filled, choose another column.");
@@ -61,9 +61,22 @@ fn get_move(board: &mut Board, marker: &Marker) {
 pub fn play_game() {
     let (rows, columns) = get_size();
     let mut board = Board::new(rows, columns);
+    let mut marker = Marker::X;
 
-    get_move(&mut board, &Marker::X);
-    board.print();
-    get_move(&mut board, &Marker::O);
-    board.print();
+    loop {
+        let column = get_move(&mut board, &mut marker);
+        board.print();
+
+        if board.is_winner(&marker, &column) {
+            println!("{} has won the game!", marker);
+            break;
+        }
+
+        if board.is_filled() {
+            println!("Game Over. No winners this time.");
+            break;
+        }
+
+        marker = marker.invert();
+    }
 }

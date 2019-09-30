@@ -7,6 +7,15 @@ pub enum Marker {
     O,
 }
 
+impl Marker {
+    pub fn invert(&self) -> Marker {
+        match *self {
+            Marker::X => Marker::O,
+            Marker::O => Marker::X,
+        }
+    }
+}
+
 impl fmt::Display for Marker {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
@@ -76,7 +85,11 @@ impl Board {
         }
     }
 
-    pub fn is_winner(&self, marker: &Marker, row: &i8, column: &i8) -> bool {
+    pub fn is_winner(&self, marker: &Marker, column: &i8) -> bool {
+        let row = match self.find_top(&column) {
+            Some(i) => i-1,
+            None => self.rows,
+        };
         let dirs: [(i8, i8); 4] = [(1, 0), (0, 1), (1, 1), (-1, 1)];
 
         for dir in dirs.iter() {
