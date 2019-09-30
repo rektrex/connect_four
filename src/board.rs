@@ -10,7 +10,7 @@ pub enum Marker {
 impl fmt::Display for Marker {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Marker::X => write!(f, "W"),
+            Marker::X => write!(f, "X"),
             Marker::O => write!(f, "O"),
         }
     }
