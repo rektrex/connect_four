@@ -51,6 +51,10 @@ impl Board {
     }
 
     fn find_top(&self, column: &i8) -> Option<i8> {
+        if *column < 1 || *column > self.columns {
+            return None
+        }
+
         for i in 1 .. self.rows+1 {
             if self.markers.get(&(i, *column)).is_none() {
                 return Some(i)
