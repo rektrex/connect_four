@@ -162,20 +162,20 @@ mod test {
         let mut board = Board::new(5, 4);
 
         board.add_marker(&1, &Marker::O);
-        assert!(!board.is_winner(&Marker::O, &1, &1));
+        assert!(!board.is_winner(&Marker::O, &1));
         board.add_marker(&1, &Marker::X);
-        assert!(!board.is_winner(&Marker::O, &2, &1));
-        assert!(!board.is_winner(&Marker::X, &2, &1));
+        assert!(!board.is_winner(&Marker::O, &1));
+        assert!(!board.is_winner(&Marker::X, &1));
 
         board.add_marker(&1, &Marker::O);
         board.add_marker(&1, &Marker::O);
         board.add_marker(&1, &Marker::O);
-        assert!(!board.is_winner(&Marker::O, &5, &1));
+        assert!(!board.is_winner(&Marker::O, &1));
 
         board.add_marker(&2, &Marker::O);
         board.add_marker(&3, &Marker::O);
         board.add_marker(&4, &Marker::O);
-        assert!(board.is_winner(&Marker::O, &1, &4));
+        assert!(board.is_winner(&Marker::O, &4));
 
         board.print();
     }
